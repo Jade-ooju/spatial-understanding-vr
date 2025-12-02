@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+
+# Large video files (use Git LFS or external storage)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+
+# Resources directory (videos should not be committed)
+resources/
+!resources/README.md
+
+# Model checkpoints and weights
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.h5
+*.pb
+checkpoints/
+models/
+
+# Hugging Face cache (if using)
+.cache/
+huggingface/
+
+# Output files (optional - you may want to commit some)
+outputs/
+results/
+
