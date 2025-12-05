@@ -291,7 +291,15 @@ def ProcessVideo(
     print("1. Initializing SAM 3 video predictor...")
     start_time = time.time()
     try:
-        predictor = build_sam3_video_predictor(gpus_to_use=[])
+        # Use GPU 0 if CUDA is available, otherwise use CPU
+        if torch.cuda.is_available():
+            gpus_to_use = [0]
+            print(f"   Using GPU: {torch.cuda.get_device_name(0)}")
+        else:
+            # For CPU, we need to check SAM 3's requirements
+            # Some versions may not support CPU, so we'll try with empty list first
+            gpus_to_use = []
+        predictor = build_sam3_video_predictor(gpus_to_use=gpus_to_use)
         elapsed = time.time() - start_time
         print(f"   ✓ SAM 3 predictor initialized ({elapsed:.2f} seconds)")
     except Exception as e:
