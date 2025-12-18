@@ -74,7 +74,7 @@ class PhysicsEstimator:
             image: Image array (H, W, 3) in RGB format with black background
         
         Returns:
-            Dictionary with 'material' and 'weight' keys
+            Dictionary with 'material', 'weight', and 'situation' keys
         """
         if not self.initialized:
             return self._placeholder_analyze(image)
@@ -89,19 +89,20 @@ class PhysicsEstimator:
             else:
                 pil_image = image
             
-            # Prepare prompts for material and weight analysis
-            material_prompt = "What material is this object made of? Answer in one word or short phrase."
-            weight_prompt = "Estimate the weight of this object. Answer in one word or short phrase like 'light', 'medium', 'heavy', or specific weight if possible."
+            # Enhanced prompts for better analysis
+            material_prompt = "What material is this object made of? Be specific (e.g., 'ceramic', 'metal', 'plastic', 'wood'). Answer in one word or short phrase."
+            weight_prompt = "Estimate the weight of this object in grams or kilograms. If you can't be specific, use 'light' (<100g), 'medium' (100g-1kg), or 'heavy' (>1kg)."
+            situation_prompt = "Describe what is happening with this object. Is it being picked up, held, placed, lifted? Answer in one short sentence."
             
-            # Get material
+            # Get material, weight, and situation
             material = self._query_vlm(pil_image, material_prompt)
-            
-            # Get weight
             weight = self._query_vlm(pil_image, weight_prompt)
+            situation = self._query_vlm(pil_image, situation_prompt)
             
             return {
                 "material": material.strip(),
-                "weight": weight.strip()
+                "weight": weight.strip(),
+                "situation": situation.strip()
             }
         
         except Exception as e:
@@ -150,7 +151,7 @@ class PhysicsEstimator:
             image: Image array (H, W, 3) in RGB format
         
         Returns:
-            Dictionary with placeholder material and weight
+            Dictionary with placeholder material, weight, and situation
         """
         # Simple heuristics based on image statistics
         # This is just a placeholder - replace with actual VLM
@@ -185,9 +186,13 @@ class PhysicsEstimator:
         elif avg_brightness < 100:
             material = "dark " + material
         
+        # Placeholder situation (always "being interacted with" for placeholder)
+        situation = "being interacted with"
+        
         return {
             "material": material,
-            "weight": weight
+            "weight": weight,
+            "situation": situation
         }
 
 
