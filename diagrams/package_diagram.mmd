@@ -1,0 +1,40 @@
+graph TB
+    subgraph "video_pipeline Package"
+        VP[video_pipeline.py<br/>Main Pipeline]
+        MOD[multi_object_detector.py<br/>Multi-Object Detection]
+        PE[physics_estimator.py<br/>Physics Estimator]
+        SHD[segment_hand_doorknob.py<br/>Specialized Segmentation]
+    end
+    
+    subgraph "External Packages"
+        SAM3_PKG[SAM 3 Package<br/>sam3.model_builder<br/>sam3.model]
+        CV2_PKG[OpenCV Package<br/>cv2]
+        TORCH_PKG[PyTorch Package<br/>torch]
+        NUMPY_PKG[NumPy Package<br/>numpy]
+        PIL_PKG[PIL Package<br/>PIL.Image]
+        TRANSFORMERS_PKG[Transformers Package<br/>transformers<br/>Optional]
+    end
+    
+    VP --> MOD
+    VP --> PE
+    VP --> CV2_PKG
+    VP --> NUMPY_PKG
+    VP --> TORCH_PKG
+    
+    MOD --> SAM3_PKG
+    MOD --> TORCH_PKG
+    MOD --> NUMPY_PKG
+    
+    PE --> PIL_PKG
+    PE --> NUMPY_PKG
+    PE --> TRANSFORMERS_PKG
+    PE --> TORCH_PKG
+    
+    SHD --> MOD
+    SHD --> CV2_PKG
+    SHD --> SAM3_PKG
+    
+    style VP fill:#E1F5FF
+    style MOD fill:#FFF4E1
+    style PE fill:#FFE1F5
+    style SHD fill:#E1FFE1

@@ -173,7 +173,7 @@ Write-Host "Testing VLM (PhysicsEstimator)..." -ForegroundColor Yellow
 $TempScript = Join-Path $env:TEMP "test_vlm_$(Get-Random).py"
 $VLMTestScript = @"
 import sys
-sys.path.insert(0, r'$ProjectDir\video_pipeline')
+sys.path.insert(0, r'$ProjectDir\scripts')
 from physics_estimator import PhysicsEstimator
 import numpy as np
 

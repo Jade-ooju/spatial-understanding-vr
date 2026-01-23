@@ -1,0 +1,105 @@
+flowchart TD
+    Start([Start: ProcessVideo]) --> CheckEnv{Environment<br/>Check}
+    CheckEnv -->|Not in sam3 env| Warn[Warn user]
+    Warn --> CheckEnv
+    CheckEnv -->|OK| InitSAM3[Initialize SAM 3<br/>Predictor]
+    
+    InitSAM3 -->|Error| Error1[Print error<br/>Exit]
+    InitSAM3 -->|Success| InitVLM[Initialize<br/>PhysicsEstimator]
+    
+    InitVLM -->|Error| Error2[Print error<br/>Exit]
+    InitVLM -->|Success| LoadVideo[Load Video<br/>with OpenCV]
+    
+    LoadVideo -->|Error| Error3[Print error<br/>Exit]
+    LoadVideo -->|Success| GetProps[Get Video Properties<br/>FPS, dimensions, frames]
+    
+    GetProps --> DetectHands[Multi-Object Detection:<br/>Detect Hands]
+    
+    DetectHands --> StartSession1[Start SAM 3 Session 1]
+    StartSession1 --> AddPrompt1[Add Prompt: 'hand'<br/>on frame 0]
+    AddPrompt1 --> Propagate1[Propagate through video]
+    
+    Propagate1 --> Loop1{More frames?}
+    Loop1 -->|Yes| ExtractMask1[Extract primary mask<br/>for frame]
+    ExtractMask1 --> StoreHand1[Store in<br/>hands_masks dict]
+    StoreHand1 --> Loop1
+    Loop1 -->|No| CloseSession1[Close Session 1]
+    
+    CloseSession1 --> DetectObject[Multi-Object Detection:<br/>Detect Target Object]
+    
+    DetectObject --> StartSession2[Start SAM 3 Session 2]
+    StartSession2 --> AddPrompt2[Add Prompt: object_prompt<br/>on frame 0]
+    AddPrompt2 --> Propagate2[Propagate through video]
+    
+    Propagate2 --> Loop2{More frames?}
+    Loop2 -->|Yes| ExtractMask2[Extract primary mask<br/>for frame]
+    ExtractMask2 --> StoreObj2[Store in<br/>object_masks dict]
+    StoreObj2 --> Loop2
+    Loop2 -->|No| CloseSession2[Close Session 2]
+    
+    CloseSession2 --> InitWriter{Output path<br/>specified?}
+    InitWriter -->|Yes| CreateWriter[Create VideoWriter]
+    InitWriter -->|No| FrameLoop
+    CreateWriter --> FrameLoop
+    
+    FrameLoop[Frame Processing Loop] --> ReadFrame[Read frame<br/>from video]
+    ReadFrame --> CheckFrame{Frame<br/>valid?}
+    CheckFrame -->|No| EndLoop[End of video]
+    CheckFrame -->|Yes| GetMasks[Get masks for<br/>current frame]
+    
+    GetMasks --> CheckMask{Mask<br/>available?}
+    CheckMask -->|No| Visualize
+    CheckMask -->|Yes| CheckVLMInterval{VLM interval<br/>reached?}
+    
+    CheckVLMInterval -->|Yes| ApplyNegMask[Apply negative<br/>masking]
+    ApplyNegMask --> RunVLM[Run VLM Analysis]
+    RunVLM --> VLMInit{VLM<br/>initialized?}
+    VLMInit -->|Yes| QueryVLM[Query Moondream2]
+    VLMInit -->|No| Placeholder[Use placeholder<br/>analysis]
+    QueryVLM --> CacheResult[Cache VLM result]
+    Placeholder --> CacheResult
+    CacheResult --> Visualize
+    
+    CheckVLMInterval -->|No| UseCached[Use cached<br/>VLM result]
+    UseCached --> Visualize
+    
+    Visualize[Visualization] --> ApplyColorMasks[Apply color masks<br/>hands: cyan, object: green]
+    ApplyColorMasks --> DrawContours[Draw contours]
+    DrawContours --> DrawWireframe[Draw 2D wireframes]
+    DrawWireframe --> DrawHUD[Draw AR HUD overlays]
+    DrawHUD --> CheckDisplay{Display<br/>enabled?}
+    
+    CheckDisplay -->|Yes| ShowFrame[Display frame<br/>with cv2.imshow]
+    ShowFrame --> CheckKey{Key pressed?}
+    CheckKey -->|'q'| Quit[Quit]
+    CheckKey -->|'p'| Pause[Pause]
+    CheckKey -->|None| WriteFrame
+    Pause --> WaitKey[Wait for key]
+    WaitKey -->|'p'| FrameLoop
+    WaitKey -->|'q'| Quit
+    
+    CheckDisplay -->|No| WriteFrame
+    WriteFrame{Output path<br/>specified?}
+    WriteFrame -->|Yes| Write[Write frame to<br/>output video]
+    WriteFrame -->|No| NextFrame
+    Write --> NextFrame[Increment<br/>frame_count]
+    NextFrame --> FrameLoop
+    
+    EndLoop --> Cleanup[Cleanup]
+    Quit --> Cleanup
+    Cleanup --> ReleaseWriter[Release VideoWriter]
+    ReleaseWriter --> CloseWindows[Close OpenCV windows]
+    CloseWindows --> ReleaseCap[Release VideoCapture]
+    ReleaseCap --> PrintStats[Print timing statistics]
+    PrintStats --> End([End])
+    
+    Error1 --> End
+    Error2 --> End
+    Error3 --> End
+    
+    style Start fill:#90EE90
+    style End fill:#FFB6C1
+    style Error1 fill:#FF6B6B
+    style Error2 fill:#FF6B6B
+    style Error3 fill:#FF6B6B
+    style Quit fill:#FFA500

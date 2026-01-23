@@ -62,7 +62,7 @@ Write-Host "4. Checking VLM (PhysicsEstimator)..." -ForegroundColor Yellow
 $ProjectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $VLMTest = @"
 import sys
-sys.path.insert(0, r'$ProjectRoot\video_pipeline')
+sys.path.insert(0, r'$ProjectRoot\scripts')
 try:
     from physics_estimator import PhysicsEstimator
     est = PhysicsEstimator()

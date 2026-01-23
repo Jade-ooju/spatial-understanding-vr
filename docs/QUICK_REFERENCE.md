@@ -1,13 +1,13 @@
 # Video Pipeline Quick Reference
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # 1. Activate environment
 conda activate sam3
 
 # 2. Run pipeline
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR_short.mkv \
   --prompt "spoon" \
   --output outputs/result.mp4
@@ -16,35 +16,35 @@ python video_pipeline/video_pipeline.py \
 vlc outputs/result.mp4
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 spatial-understanding-vr/
-├── video_pipeline/                  # Scripts
-│   ├── video_pipeline.py            # Main script
-│   ├── physics_estimator.py         # VLM wrapper
-│   └── monitor_progress.sh          # Monitor tool
-├── outputs/                         # Results (user creates)
-│   ├── *.mp4                       # Output videos
-│   └── *.log                        # Log files
-└── docs/                            # Documentation
-    ├── README.md                    # Overview
-    ├── VIDEO_PIPELINE_USAGE.md      # Usage guide
-    └── FINAL_RESULTS.md             # Results
+├── scripts/ # All scripts
+│ ├── video_pipeline.py # Main pipeline script
+│ ├── multi_object_detector.py # Multi-object detection
+│ ├── physics_estimator.py # VLM wrapper
+│ └── ... # Other utility scripts
+├── outputs/ # Results (user creates)
+│ ├── *.mp4 # Output videos
+│ └── *.log # Log files
+└── docs/ # Documentation
+ ├── README.md # Overview
+ └── VIDEO_PIPELINE_USAGE.md # Usage guide
 ```
 
-## 🔧 Common Commands
+## Common Commands
 
 ### Basic Usage
 ```bash
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video <video_path> \
   --prompt "<object_name>"
 ```
 
 ### With Output
 ```bash
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video <video_path> \
   --prompt "<object_name>" \
   --output outputs/result.mp4
@@ -52,7 +52,7 @@ python video_pipeline/video_pipeline.py \
 
 ### Headless Mode
 ```bash
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video <video_path> \
   --prompt "<object_name>" \
   --no-display \
@@ -61,18 +61,13 @@ python video_pipeline/video_pipeline.py \
 
 ### Limit Frames (for testing)
 ```bash
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video <video_path> \
   --prompt "<object_name>" \
   --max-frames 100
 ```
 
-### Monitor Progress
-```bash
-./video_pipeline/monitor_progress.sh
-```
-
-## ⚙️ Options
+## Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
@@ -83,7 +78,7 @@ python video_pipeline/video_pipeline.py \
 | `--no-display` | Disable display window | False |
 | `--max-frames` | Limit to N frames | None |
 
-## 📊 Expected Performance
+## Expected Performance
 
 **For 122 frames @ 1920x1080:**
 - Model init: ~7 seconds
@@ -94,13 +89,13 @@ python video_pipeline/video_pipeline.py \
 
 **Total**: ~85-90 minutes
 
-## 📍 Output Locations
+## Output Locations
 
 - **Videos**: `outputs/*.mp4` (user creates this directory)
 - **Logs**: `outputs/*.log` (user creates this directory)
 - **Documentation**: `docs/`
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### "Module not found"
 ```bash
@@ -117,9 +112,9 @@ Use `--max-frames` to limit processing, or create shorter test video.
 ### Slow processing
 Propagation is slow on CPU (~30-40s per frame). GPU would be much faster.
 
-## 📖 More Information
+## More Information
 
 - **Full Usage Guide**: [VIDEO_PIPELINE_USAGE.md](VIDEO_PIPELINE_USAGE.md)
-- **Architecture**: [VIDEO_PIPELINE_PLAN.md](VIDEO_PIPELINE_PLAN.md)
-- **Results**: [FINAL_RESULTS.md](FINAL_RESULTS.md)
+- **Architecture**: [VIDEO_POST_PROCESSING_ANALYSIS.md](VIDEO_POST_PROCESSING_ANALYSIS.md)
+- **Project Structure**: [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
 

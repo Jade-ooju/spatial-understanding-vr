@@ -1,0 +1,47 @@
+graph TB
+    subgraph Input["INPUT"]
+        VIDEO[Video File<br/>MP4/MKV]
+        PROMPT[Text Prompt<br/>e.g., 'spoon']
+    end
+    
+    subgraph Pipeline["VIDEO PIPELINE"]
+        VP[Video Pipeline<br/>Main Orchestrator]
+        MOD[Multi-Object Detector<br/>Hands + Objects]
+        PE[Physics Estimator<br/>VLM Analysis]
+    end
+    
+    subgraph Processing["PROCESSING STAGES"]
+        DETECT[1. Detection<br/>SAM 3 Sessions]
+        MASK[2. Mask Extraction<br/>Frame-indexed]
+        VLM[3. VLM Analysis<br/>Every 30 frames]
+        VIZ[4. Visualization<br/>Masks + AR HUD]
+    end
+    
+    subgraph Output["OUTPUT"]
+        DISPLAY[Real-time Display<br/>OpenCV Window]
+        ANNOTATED[Annotated Video<br/>MP4 with overlays]
+    end
+    
+    VIDEO --> VP
+    PROMPT --> VP
+    
+    VP --> MOD
+    VP --> PE
+    
+    MOD --> DETECT
+    DETECT --> MASK
+    MASK --> VLM
+    VLM --> VIZ
+    
+    VIZ --> DISPLAY
+    VIZ --> ANNOTATED
+    
+    style VP fill:#4A90E2,color:#fff,stroke:#2E5C8A,stroke-width:3px
+    style MOD fill:#50C878,color:#fff,stroke:#2D8659,stroke-width:2px
+    style PE fill:#FF6B6B,color:#fff,stroke:#CC5555,stroke-width:2px
+    style DETECT fill:#FFD93D,color:#000,stroke:#CCAA00,stroke-width:2px
+    style MASK fill:#9B59B6,color:#fff,stroke:#7D3C98,stroke-width:2px
+    style VLM fill:#3498DB,color:#fff,stroke:#2874A6,stroke-width:2px
+    style VIZ fill:#E67E22,color:#fff,stroke:#BA5F1A,stroke-width:2px
+    style DISPLAY fill:#1ABC9C,color:#fff,stroke:#148F77,stroke-width:2px
+    style ANNOTATED fill:#E74C3C,color:#fff,stroke:#B93E30,stroke-width:2px

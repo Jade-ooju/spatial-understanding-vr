@@ -1,0 +1,97 @@
+sequenceDiagram
+    participant User
+    participant VP as Video Pipeline
+    participant MOD as Multi-Object Detector
+    participant SAM3 as SAM 3 Predictor
+    participant PE as Physics Estimator
+    participant VLM as Moondream2 VLM
+    participant CV2 as OpenCV
+    participant Video as Video File
+    
+    User->>VP: ProcessVideo(video_path, prompt)
+    
+    Note over VP: Phase 1: Initialization
+    VP->>VP: check_environment()
+    VP->>SAM3: build_sam3_video_predictor()
+    SAM3-->>VP: predictor instance
+    VP->>PE: PhysicsEstimator()
+    PE->>VLM: Initialize Moondream2 (optional)
+    VLM-->>PE: model instance (or None)
+    PE-->>VP: estimator instance
+    
+    Note over VP: Phase 2: Video Loading
+    VP->>CV2: VideoCapture(video_path)
+    CV2->>Video: Open video file
+    Video-->>CV2: Video metadata
+    CV2-->>VP: FPS, dimensions, frame_count
+    
+    Note over VP: Phase 3: Multi-Object Detection
+    VP->>MOD: detect_hands_and_object(video_path, prompt, predictor)
+    
+    Note over MOD,SAM3: Session 1: Hand Detection
+    MOD->>SAM3: start_session(video_path)
+    SAM3-->>MOD: session_id_hands
+    MOD->>SAM3: add_prompt("hand", frame=0)
+    MOD->>SAM3: propagate_in_video()
+    loop For each frame
+        SAM3-->>MOD: frame_idx, outputs (masks, probs)
+        MOD->>MOD: extract_primary_mask()
+        MOD->>MOD: Store in hands_masks[frame_idx]
+    end
+    MOD->>SAM3: close_session()
+    
+    Note over MOD,SAM3: Session 2: Object Detection
+    MOD->>SAM3: start_session(video_path)
+    SAM3-->>MOD: session_id_obj
+    MOD->>SAM3: add_prompt(object_prompt, frame=0)
+    MOD->>SAM3: propagate_in_video()
+    loop For each frame
+        SAM3-->>MOD: frame_idx, outputs (masks, probs)
+        MOD->>MOD: extract_primary_mask()
+        MOD->>MOD: Store in object_masks[frame_idx]
+    end
+    MOD->>SAM3: close_session()
+    MOD-->>VP: {hands: masks_dict, object: masks_dict}
+    
+    Note over VP: Phase 4: Frame Processing
+    VP->>CV2: VideoWriter(output_path) [if specified]
+    
+    loop For each frame
+        VP->>CV2: cap.read()
+        CV2-->>VP: frame (BGR)
+        
+        VP->>VP: Get masks[frame_count]
+        VP->>VP: hand_mask = hands_masks[frame_count]
+        VP->>VP: object_mask = object_masks[frame_count]
+        
+        alt VLM interval reached
+            VP->>VP: apply_negative_mask(frame, mask)
+            VP->>PE: analyze(masked_frame_rgb)
+            alt VLM initialized
+                PE->>VLM: Query material, weight, situation
+                VLM-->>PE: Analysis results
+            else VLM not available
+                PE->>PE: _placeholder_analyze()
+            end
+            PE-->>VP: {material, weight, situation}
+            VP->>VP: Cache VLM result
+        end
+        
+        VP->>VP: visualize_multi_object_masks()
+        VP->>VP: draw_wireframe_2d()
+        VP->>VP: draw_context_block()
+        VP->>VP: draw_action_label()
+        
+        alt Display enabled
+            VP->>CV2: imshow(annotated_frame)
+            CV2-->>User: Display frame
+        end
+        
+        alt Output path specified
+            VP->>CV2: video_writer.write(annotated_frame)
+        end
+    end
+    
+    VP->>CV2: video_writer.release()
+    VP->>CV2: destroyAllWindows()
+    VP-->>User: Processing complete

@@ -2,23 +2,23 @@
 
 A video processing pipeline for analyzing first-person VR headset videos using SAM 3 (Segment Anything Model 3) and VLM (Vision Language Model) for object segmentation and physical property analysis.
 
-## 🎯 Features
+## Features
 
 - **Object Segmentation**: Detect and segment objects in VR videos using SAM 3
 - **Physical Property Analysis**: Analyze material and weight using VLM
 - **Real-time Visualization**: View results with mask contours and text overlays
 - **Performance Tracking**: Complete timing information for all processing steps
 
-## 📋 Requirements
+## Requirements
 
 - Python 3.8+
 - SAM 3 (install via pip)
 - OpenCV
 - PyTorch
 - NumPy
-- Moondream2 (optional, for VLM)
+- Moondream2
 
-## 🚀 Installation
+## Installation
 
 ### 1. Install SAM 3
 
@@ -43,12 +43,12 @@ pip install opencv-python transformers torch numpy
 hf auth login
 ```
 
-## 💻 Usage
+## Usage
 
 ### Basic Usage
 
 ```bash
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video path/to/video.mp4 \
   --prompt "spoon" \
   --output outputs/result.mp4
@@ -67,50 +67,69 @@ python video_pipeline/video_pipeline.py \
 
 ```bash
 # Process VR video for spoon detection
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR.mkv \
   --prompt "spoon" \
   --vlm-interval 30 \
   --output outputs/spoon_analysis.mp4
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 .
-├── README.md                    # This file
-├── SAM3_LICENSE                 # SAM 3 license (required)
-├── .gitignore                   # Git ignore file
-├── video_pipeline/              # Pipeline scripts
-│   ├── video_pipeline.py        # Main pipeline
-│   ├── physics_estimator.py     # VLM wrapper
-│   └── monitor_progress.sh      # Progress monitor
-├── docs/                        # Documentation
-│   ├── README.md                # Documentation index
-│   ├── QUICK_REFERENCE.md       # Quick start
-│   ├── VIDEO_PIPELINE_USAGE.md  # Usage guide
-│   └── ...                      # Other docs
-├── tests/                       # Test scripts
-│   └── test_my_vr_image.py     # VR image test
-├── scripts/                     # Utility scripts
-│   └── install_sam3.sh         # Installation helper
-└── resources/                   # Input videos (not in git)
-    └── README.md                # Resources info
+├── README.md # This file
+├── SAM3_LICENSE # SAM 3 license (required)
+├── .gitignore # Git ignore file
+│
+├── scripts/ # All scripts (pipeline + utilities)
+│ ├── video_pipeline.py # Main pipeline orchestrator
+│ ├── multi_object_detector.py # Multi-object detection
+│ ├── physics_estimator.py # VLM wrapper
+│ ├── install_sam3.sh # Installation helper (Linux)
+│ ├── install_sam3_windows.ps1 # Installation helper (Windows)
+│ ├── verify_setup.ps1 # Setup verification
+│ ├── crop_video.py # Video preprocessing
+│ └── render_diagrams.py # Diagram rendering utility
+│
+├── docs/ # Documentation
+│ ├── README.md # Documentation index
+│ ├── QUICK_REFERENCE.md # Quick reference
+│ ├── VIDEO_PIPELINE_USAGE.md # Usage guide
+│ ├── VIDEO_POST_PROCESSING_ANALYSIS.md # Complete analysis
+│ ├── SETUP.md # GitHub repository setup
+│ ├── SETUP_WINDOWS.md # Windows setup guide
+│ └── PROJECT_STRUCTURE.md # Project organization
+│
+├── diagrams/ # Rendered UML diagrams
+│ ├── high_level_overview.png # High-level overview
+│ ├── pipeline_flow.png # Detailed flow diagram
+│ ├── HIGH_QUALITY_DIAGRAMS.md # Diagram guide
+│ └── ... # Other diagrams (PNG/SVG)
+│
+├── tests/ # Test scripts
+│ ├── test_my_vr_image.py # VR image test
+│ ├── test_ar_hud.py # AR HUD test
+│ └── README.md # Test documentation
+│
+├── archive/ # Historical/deprecated files
+│ └── README.md # Archive documentation
+│
+└── resources/ # Input videos (not in git)
+ └── README.md # Resources info
 ```
 
-## 📚 Documentation
+## Documentation
 
 See [`docs/`](docs/) for complete documentation:
+- [Documentation Index](docs/README.md) - Complete documentation list
 - [Quick Reference](docs/QUICK_REFERENCE.md) - Quick start commands
 - [Usage Guide](docs/VIDEO_PIPELINE_USAGE.md) - Complete usage instructions
-- [Results](docs/FINAL_RESULTS.md) - Test results and timing
-- [GitHub Upload Guide](docs/GITHUB_UPLOAD_GUIDE.md) - Legal considerations
+- [Windows Setup](docs/SETUP_WINDOWS.md) - Windows setup guide with GPU support
+- [Pipeline Analysis](docs/VIDEO_POST_PROCESSING_ANALYSIS.md) - Complete pipeline analysis
+- [Project Structure](docs/PROJECT_STRUCTURE.md) - Project organization
 
-## ⚖️ License & Attribution
-
-### This Project
-
-This project code is provided under [YOUR LICENSE HERE - e.g., MIT License].
+## License
 
 ### SAM 3
 
@@ -124,42 +143,9 @@ This project uses [SAM 3 (Segment Anything Model 3)](https://github.com/facebook
 - This derivative work complies with SAM 3 license requirements
 - See [SAM 3 repository](https://github.com/facebookresearch/sam3) for more information
 
-### Attribution
 
-If you use this code in research, please cite:
-
-```bibtex
-@article{sam3,
-  title={SAM 3: Segment Anything with Concepts},
-  author={Meta AI Research},
-  year={2025},
-  url={https://ai.meta.com/sam3}
-}
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📝 Citation
-
-If you use this project in your research, please cite:
-
-```bibtex
-@software{spatial_understanding_vr,
-  title={Spatial Understanding for VR: Video Pipeline with SAM 3 and VLM},
-  author={Your Name},
-  year={2025},
-  url={https://github.com/Jade-ooju/spatial-understanding-vr}
-}
-```
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [SAM 3](https://github.com/facebookresearch/sam3) by Meta AI Research for object segmentation
-- [Moondream2](https://github.com/vikhyat/moondream) for VLM capabilities (optional)
-
-## ⚠️ Disclaimer
-
-This project is provided "as is" without warranty of any kind. See LICENSE files for details.
+- [Moondream2](https://github.com/vikhyat/moondream) for VLM capabilities
 

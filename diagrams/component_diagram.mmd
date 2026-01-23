@@ -1,0 +1,45 @@
+graph TB
+    subgraph "Video Pipeline System"
+        VP[Video Pipeline<br/>video_pipeline.py]
+        MOD[Multi-Object Detector<br/>multi_object_detector.py]
+        PE[Physics Estimator<br/>physics_estimator.py]
+        SHD[Segment Hand/Doorknob<br/>segment_hand_doorknob.py]
+    end
+    
+    subgraph "External Libraries"
+        SAM3[SAM 3 Model<br/>Segment Anything Model 3]
+        VLM[Moondream2 VLM<br/>Vision Language Model]
+        CV2[OpenCV<br/>Video I/O & Visualization]
+        TORCH[PyTorch<br/>Tensor Operations]
+    end
+    
+    subgraph "Data Storage"
+        VIDEO[Input Video<br/>MP4/MKV]
+        MASKS[Mask Dictionary<br/>Frame-indexed masks]
+        OUTPUT[Output Video<br/>Annotated MP4]
+    end
+    
+    VP --> MOD
+    VP --> PE
+    VP --> CV2
+    VP --> VIDEO
+    VP --> OUTPUT
+    
+    MOD --> SAM3
+    MOD --> TORCH
+    MOD --> MASKS
+    
+    PE --> VLM
+    PE --> TORCH
+    
+    SHD --> MOD
+    SHD --> CV2
+    
+    CV2 --> VIDEO
+    CV2 --> OUTPUT
+    
+    style VP fill:#e1f5ff
+    style MOD fill:#fff4e1
+    style PE fill:#ffe1f5
+    style SAM3 fill:#e1ffe1
+    style VLM fill:#e1ffe1

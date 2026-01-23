@@ -10,28 +10,28 @@ The `video_pipeline.py` script processes VR headset videos to:
 ## Prerequisites
 
 1. **Activate the sam3 conda environment:**
-   ```bash
-   conda activate sam3
-   ```
+ ```bash
+ conda activate sam3
+ ```
 
 2. **Ensure dependencies are installed:**
-   - SAM 3 (already installed in the environment)
-   - OpenCV: `pip install opencv-python`
-   - Moondream2 (optional, for VLM): `pip install transformers torch`
+ - SAM 3 (already installed in the environment)
+ - OpenCV: `pip install opencv-python`
+ - Moondream2 (optional, for VLM): `pip install transformers torch`
 
 ## Basic Usage
 
 ### Process video with default settings:
 ```bash
 # From repository root
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR.mkv \
   --prompt "spoon"
 ```
 
 ### Process video with custom VLM interval:
 ```bash
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR.mkv \
   --prompt "spoon" \
   --vlm-interval 30
@@ -39,7 +39,7 @@ python video_pipeline/video_pipeline.py \
 
 ### Save output video:
 ```bash
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR.mkv \
   --prompt "spoon" \
   --output outputs/annotated_video.mp4
@@ -47,7 +47,7 @@ python video_pipeline/video_pipeline.py \
 
 ### Run without display (headless):
 ```bash
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR.mkv \
   --prompt "spoon" \
   --no-display \
@@ -61,6 +61,7 @@ python video_pipeline/video_pipeline.py \
 - `--vlm-interval`: Run VLM every N frames (default: 30)
 - `--no-display`: Disable real-time display
 - `--output`: Optional path to save annotated video
+- `--max-frames`: Limit processing to first N frames (useful for testing)
 
 ## Workflow
 
@@ -69,10 +70,10 @@ python video_pipeline/video_pipeline.py \
 3. **Text Prompt**: Adds text prompt (e.g., "spoon") on frame 0
 4. **Propagation**: Propagates tracking through entire video
 5. **Frame Processing**:
-   - Extracts mask for each frame
-   - Applies negative masking (black background)
-   - Runs VLM every N frames (default: 30)
-   - Visualizes with green contours and VLM text overlay
+ - Extracts mask for each frame
+ - Applies negative masking (black background)
+ - Runs VLM every N frames (default: 30)
+ - Visualizes with green contours and VLM text overlay
 6. **Display**: Shows real-time visualization (press 'q' to quit, 'p' to pause)
 
 ## Controls
@@ -85,25 +86,25 @@ python video_pipeline/video_pipeline.py \
 The script displays:
 - Green mask contours around detected objects
 - VLM analysis text overlay showing:
-  - Material: [material type]
-  - Weight: [weight estimate]
+ - Material: [material type]
+ - Weight: [weight estimate]
 
 ## Example: Processing VR Video for Spoon Detection
 
 ```bash
 # Basic usage
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR.mkv \
   --prompt "spoon"
 
 # With output video
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR.mkv \
   --prompt "spoon" \
   --output outputs/spoon_analysis.mp4
 
 # Faster processing (VLM every 60 frames instead of 30)
-python video_pipeline/video_pipeline.py \
+python scripts/video_pipeline.py \
   --video resources/VR.mkv \
   --prompt "spoon" \
   --vlm-interval 60
