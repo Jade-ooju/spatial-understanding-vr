@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    
+    participant User
+    participant Main as Main Pipeline
+    participant Detection as Detection Phase
+    participant Processing as Processing Phase
+    participant Output as Output Phase
+    
+    User->>Main: Execute ProcessVideo()
+    Main->>Main: Initialize (SAM 3, VLM)
+    Main->>Detection: Run Multi-Object Detection
+    
+    par Hand Detection
+        Detection->>Detection: SAM 3 Session 1
+        Detection->>Detection: Detect hands
+    and Object Detection
+        Detection->>Detection: SAM 3 Session 2
+        Detection->>Detection: Detect object
+    end
+    
+    Detection-->>Main: Return mask dictionaries
+    Main->>Processing: Process frames
+    
+    loop For each frame
+        Processing->>Processing: Get masks
+        Processing->>Processing: VLM analysis (if interval)
+        Processing->>Processing: Visualize
+        Processing->>Output: Annotated frame
+    end
+    
+    Output->>User: Display/Write video
+    Main-->>User: Complete

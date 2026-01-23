@@ -1,0 +1,74 @@
+classDiagram
+    class PhysicsEstimator {
+        -str model_name
+        -model model
+        -tokenizer tokenizer
+        -bool initialized
+        +__init__(model_name: str)
+        -_initialize_moondream2()
+        +analyze(image: np.ndarray) Dict[str, str]
+        -_query_vlm(image: Image, prompt: str) str
+        -_placeholder_analyze(image: np.ndarray) Dict[str, str]
+    }
+    
+    class SAM3VideoPredictor {
+        <<external>>
+        +handle_request(request: dict) dict
+        +handle_stream_request(request: dict) Iterator[dict]
+    }
+    
+    class VideoPipeline {
+        <<module functions>>
+        +ProcessVideo(video_path, text_prompt, vlm_interval, display, output_path, max_frames)
+        +check_environment()
+        +apply_negative_mask(frame, mask) np.ndarray
+        +extract_primary_mask(outputs, frame_idx) np.ndarray
+        +draw_mask_contour(frame, mask, color) np.ndarray
+        +apply_color_mask(frame, mask, color, alpha) np.ndarray
+        +visualize_multi_object_masks(frame, hand_mask, object_mask) np.ndarray
+        +draw_wireframe_2d(frame, mask, color) np.ndarray
+        +draw_estimated_3d_box(frame, mask, color) np.ndarray
+        +draw_context_block(frame, vlm_result, object_prompt, position) np.ndarray
+        +draw_action_label(frame, mask, situation, frame_width, frame_height) np.ndarray
+        +extract_action_and_state(situation) Tuple[str, str]
+    }
+    
+    class MultiObjectDetector {
+        <<module functions>>
+        +detect_hands_and_object(video_path, object_prompt, predictor, max_frames) Dict
+        +extract_primary_mask(outputs, frame_idx) np.ndarray
+    }
+    
+    class SegmentHandDoorknob {
+        <<module functions>>
+        +process_image(image_path, hand_prompt, doorknob_prompt, output_path)
+        +process_video(video_path, hand_prompt, doorknob_prompt, output_path, max_frames, contours_only)
+        +visualize_segmented_image(frame, hand_mask, doorknob_mask) np.ndarray
+    }
+    
+    class OpenCV {
+        <<external library>>
+        +VideoCapture(path)
+        +VideoWriter(path, fourcc, fps, size)
+        +imshow(name, frame)
+        +waitKey(delay) int
+        +destroyAllWindows()
+    }
+    
+    class Moondream2VLM {
+        <<external model>>
+        +answer_question(image, prompt, tokenizer) str
+    }
+    
+    VideoPipeline --> PhysicsEstimator : uses
+    VideoPipeline --> SAM3VideoPredictor : uses
+    VideoPipeline --> MultiObjectDetector : uses
+    VideoPipeline --> OpenCV : uses
+    MultiObjectDetector --> SAM3VideoPredictor : uses
+    PhysicsEstimator --> Moondream2VLM : uses (optional)
+    SegmentHandDoorknob --> MultiObjectDetector : uses
+    SegmentHandDoorknob --> OpenCV : uses
+    
+    note for PhysicsEstimator "Can operate in placeholder\nmode if VLM unavailable"
+    note for VideoPipeline "Main orchestrator module\nwith utility functions"
+    note for MultiObjectDetector "Handles separate SAM 3\nsessions for hands and objects"

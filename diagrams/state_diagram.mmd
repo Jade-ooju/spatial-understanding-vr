@@ -1,0 +1,46 @@
+stateDiagram-v2
+    [*] --> Initializing: ProcessVideo() called
+    
+    Initializing --> EnvironmentCheck: Start initialization
+    EnvironmentCheck --> SAM3Init: Environment OK
+    EnvironmentCheck --> Error: Environment invalid
+    
+    SAM3Init --> VLMInit: SAM 3 ready
+    SAM3Init --> Error: SAM 3 failed
+    
+    VLMInit --> VideoLoading: VLM ready (or placeholder)
+    VLMInit --> VideoLoading: VLM failed (use placeholder)
+    
+    VideoLoading --> DetectionPhase: Video loaded
+    VideoLoading --> Error: Video load failed
+    
+    DetectionPhase --> HandDetection: Start detection
+    HandDetection --> ObjectDetection: Hands detected
+    ObjectDetection --> ProcessingPhase: Object detected
+    
+    ProcessingPhase --> ReadingFrame: Start frame loop
+    ReadingFrame --> MaskRetrieval: Frame read
+    ReadingFrame --> Cleanup: End of video
+    
+    MaskRetrieval --> VLMCheck: Masks retrieved
+    VLMCheck --> VLMProcessing: Interval reached
+    VLMCheck --> Visualization: Use cached
+    
+    VLMProcessing --> Visualization: VLM complete
+    Visualization --> Display: Annotated frame ready
+    Display --> Writing: Frame displayed
+    Writing --> ReadingFrame: Frame written/processed
+    
+    Cleanup --> [*]: Processing complete
+    Error --> [*]: Error occurred
+    
+    note right of VLMCheck
+        VLM runs every N frames
+        (default: 30)
+    end note
+    
+    note right of DetectionPhase
+        Two separate SAM 3 sessions:
+        1. Hand detection
+        2. Object detection
+    end note

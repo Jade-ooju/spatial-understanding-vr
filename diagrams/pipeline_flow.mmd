@@ -1,0 +1,46 @@
+flowchart TD
+    Start([START<br/>ProcessVideo]) --> Init[Initialize<br/>SAM 3 + VLM]
+    
+    Init --> Load[Load Video<br/>OpenCV]
+    
+    Load --> Detect[Multi-Object Detection]
+    
+    Detect --> HandDet[Session 1:<br/>Detect Hands]
+    Detect --> ObjDet[Session 2:<br/>Detect Objects]
+    
+    HandDet --> Masks[Mask Storage<br/>hands_masks + object_masks]
+    ObjDet --> Masks
+    
+    Masks --> Loop[Frame Processing Loop]
+    
+    Loop --> Read[Read Frame]
+    Read --> GetMask[Get Masks<br/>for Frame]
+    
+    GetMask --> CheckVLM{VLM Interval?<br/>Every 30 frames}
+    CheckVLM -->|Yes| VLM[VLM Analysis<br/>Material, Weight, Situation]
+    CheckVLM -->|No| Cache[Use Cached Result]
+    
+    VLM --> Cache
+    Cache --> Visualize[Visualization]
+    
+    Visualize --> Color[Color Masks<br/>Cyan/Green]
+    Color --> Contour[Contours]
+    Contour --> Wire[Wireframes]
+    Wire --> HUD[AR HUD Overlays]
+    
+    HUD --> Display{Display?}
+    Display -->|Yes| Show[Show Frame]
+    Display -->|No| Write
+    Show --> Write[Write to Video]
+    
+    Write --> Next{More Frames?}
+    Next -->|Yes| Loop
+    Next -->|No| End([END<br/>Complete])
+    
+    style Start fill:#90EE90,stroke:#2E7D32,stroke-width:3px
+    style End fill:#FFB6C1,stroke:#C2185B,stroke-width:3px
+    style Init fill:#E1F5FF,stroke:#0277BD,stroke-width:2px
+    style Detect fill:#FFF4E1,stroke:#F57C00,stroke-width:2px
+    style VLM fill:#FFE1F5,stroke:#C2185B,stroke-width:2px
+    style Visualize fill:#E1FFE1,stroke:#388E3C,stroke-width:2px
+    style Masks fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px

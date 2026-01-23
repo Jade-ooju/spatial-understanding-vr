@@ -1,84 +1,77 @@
 # Video Pipeline Documentation
 
-This directory contains all documentation for the SAM 3 + VLM Video Pipeline project.
+This directory contains essential documentation for the SAM 3 + VLM Video Pipeline project.
 
-## 📚 Documentation Index
+## Documentation Index
 
 ### Getting Started
-- **[VIDEO_PIPELINE_USAGE.md](VIDEO_PIPELINE_USAGE.md)** - Quick start guide and usage instructions
-- **[VIDEO_PIPELINE_PLAN.md](VIDEO_PIPELINE_PLAN.md)** - Implementation plan and architecture design
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Quick reference commands and common usage
+- **[VIDEO_PIPELINE_USAGE.md](VIDEO_PIPELINE_USAGE.md)** - Complete usage guide with examples
+- **[SETUP_WINDOWS.md](SETUP_WINDOWS.md)** - Windows setup guide with GPU support
 
-### Results & Testing
-- **[FINAL_RESULTS.md](FINAL_RESULTS.md)** - Complete results from test run with timing breakdown
-- **[TIMING_RESULTS.md](TIMING_RESULTS.md)** - Detailed timing analysis
-- **[RESULTS_LOCATION.md](RESULTS_LOCATION.md)** - Where to find output files and results
-- **[TEST_RESULTS.md](TEST_RESULTS.md)** - Initial test results and troubleshooting
+### Architecture & Design
+- **[VIDEO_POST_PROCESSING_ANALYSIS.md](VIDEO_POST_PROCESSING_ANALYSIS.md)** - Complete pipeline analysis and architecture
 
-## 🚀 Quick Start
+### Project Organization
+- **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** - Project structure and organization
+- **[SETUP.md](SETUP.md)** - GitHub repository setup guide (optional)
 
-1. **Activate environment**:
+## Quick Start
+
+1. Activate environment:
    ```bash
    conda activate sam3
    ```
 
-2. **Run the pipeline**:
+2. Run the pipeline:
    ```bash
-   python video_pipeline/video_pipeline.py \
+   python scripts/video_pipeline.py \
      --video resources/VR_short.mkv \
      --prompt "spoon" \
      --output outputs/analysis.mp4
    ```
 
-3. **View results**:
+3. View results:
    ```bash
    vlc outputs/analysis.mp4
    ```
 
-## 📁 Project Structure
+## Pipeline Overview
 
-```
-spatial-understanding-vr/
-├── video_pipeline/          # Pipeline scripts
-│   ├── video_pipeline.py            # Main pipeline script
-│   ├── physics_estimator.py         # VLM wrapper
-│   └── monitor_progress.sh          # Progress monitoring
-├── outputs/          # Results and logs
-│   ├── spoon_analysis.mp4          # Output videos
-│   └── test_results_with_timing.log # Log files
-└── docs/             # Documentation (this directory)
-```
+The video pipeline processes VR headset videos through the following stages:
 
-## 🔧 Components
+1. **Initialization**: Loads SAM 3 model and VLM (if available)
+2. **Multi-Object Detection**: Detects hands and target objects using separate SAM 3 sessions
+3. **Frame Processing**: Processes each frame with masks, VLM analysis, and visualization
+4. **Output**: Generates annotated video with AR HUD overlays
+
+## Key Components
 
 ### video_pipeline.py
-Main pipeline script that:
+Main pipeline orchestrator that:
 - Integrates SAM 3 for object segmentation
-- Applies negative masking (black background)
-- Runs VLM analysis for physical properties
-- Creates annotated output video
+- Applies negative masking (black background) for VLM
+- Runs VLM analysis for physical properties (every 30 frames by default)
+- Creates annotated output video with AR HUD overlays
+
+### multi_object_detector.py
+Handles separate SAM 3 sessions for:
+- Hand detection (prompt: "hand")
+- Target object detection (custom prompt, e.g., "spoon")
 
 ### physics_estimator.py
 VLM wrapper class that:
-- Supports Moondream2 integration
+- Supports Moondream2 integration (optional)
 - Provides placeholder mode when VLM not available
-- Analyzes material and weight properties
+- Analyzes material, weight, and situation properties
 
-### monitor_progress.sh
-Utility script to monitor pipeline progress in real-time.
+## Performance Characteristics
 
-## 📊 Results
+- **SAM 3 Propagation**: Processes entire video in one session (main bottleneck)
+- **VLM Analysis**: Runs every 30 frames by default (configurable via `--vlm-interval`)
+- **Frame Processing**: Fast visualization and video writing (real-time capable)
+- **Memory**: SAM 3 loads entire video into memory (session-based API)
 
-See [FINAL_RESULTS.md](FINAL_RESULTS.md) for complete results from the test run.
+## Historical Documentation
 
-**Key Metrics** (for 122 frames @ 1920x1080):
-- Total time: ~85.5 minutes
-- Propagation: 85.3 minutes (bottleneck)
-- Frame processing: 3.84 seconds
-- VLM analysis: 0.12 seconds (5 calls)
-
-## 📖 More Information
-
-- **Usage Guide**: [VIDEO_PIPELINE_USAGE.md](VIDEO_PIPELINE_USAGE.md)
-- **Architecture**: [VIDEO_PIPELINE_PLAN.md](VIDEO_PIPELINE_PLAN.md)
-- **Results**: [FINAL_RESULTS.md](FINAL_RESULTS.md)
-
+Historical test results, implementation notes, and deprecated documentation have been moved to the `archive/` folder. See `archive/ARCHIVED_DOCS_README.md` for details.

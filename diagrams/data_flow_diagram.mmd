@@ -1,0 +1,59 @@
+flowchart LR
+    subgraph Input
+        VIDEO[Video File<br/>MP4/MKV]
+        PROMPT[Text Prompt<br/>e.g., 'spoon']
+    end
+    
+    subgraph Processing
+        CV2_READ[OpenCV<br/>VideoCapture]
+        SAM3_HANDS[SAM 3<br/>Hand Detection]
+        SAM3_OBJ[SAM 3<br/>Object Detection]
+        MASKS_STORE[(Mask Storage<br/>hands_masks<br/>object_masks)]
+        NEG_MASK[Negative Masking<br/>Black Background]
+        VLM_ANALYSIS[VLM Analysis<br/>PhysicsEstimator]
+        VLM_CACHE[(VLM Cache<br/>Last Result)]
+    end
+    
+    subgraph Visualization
+        COLOR_MASK[Color Masks<br/>Cyan/Green Overlay]
+        CONTOURS[Contours<br/>Edge Detection]
+        WIREFRAME[Wireframes<br/>2D Sparse Lines]
+        HUD[AR HUD Overlays<br/>Context & Action]
+    end
+    
+    subgraph Output
+        DISPLAY[Real-time Display<br/>OpenCV Window]
+        OUTPUT_VID[Output Video<br/>Annotated MP4]
+    end
+    
+    VIDEO --> CV2_READ
+    PROMPT --> SAM3_OBJ
+    
+    CV2_READ --> SAM3_HANDS
+    CV2_READ --> SAM3_OBJ
+    
+    SAM3_HANDS --> MASKS_STORE
+    SAM3_OBJ --> MASKS_STORE
+    
+    CV2_READ --> MASKS_STORE
+    MASKS_STORE --> NEG_MASK
+    
+    NEG_MASK --> VLM_ANALYSIS
+    VLM_ANALYSIS --> VLM_CACHE
+    VLM_CACHE --> HUD
+    
+    MASKS_STORE --> COLOR_MASK
+    MASKS_STORE --> CONTOURS
+    MASKS_STORE --> WIREFRAME
+    
+    COLOR_MASK --> CONTOURS
+    CONTOURS --> WIREFRAME
+    WIREFRAME --> HUD
+    
+    HUD --> DISPLAY
+    HUD --> OUTPUT_VID
+    
+    style VIDEO fill:#E1F5FF
+    style OUTPUT_VID fill:#FFE1F5
+    style VLM_ANALYSIS fill:#FFF4E1
+    style MASKS_STORE fill:#E1FFE1
